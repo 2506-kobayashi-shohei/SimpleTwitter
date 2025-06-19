@@ -36,6 +36,7 @@ public class UserDao {
 
     }
 
+    //登録
     public void insert(Connection connection, User user) {
 
 	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
@@ -79,9 +80,8 @@ public class UserDao {
         }
     }
 
+    //ログイン
     public User select(Connection connection, String accountOrEmail, String password) {
-
-
 	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
         " : " + new Object(){}.getClass().getEnclosingMethod().getName());
 
@@ -115,6 +115,7 @@ public class UserDao {
         }
     }
 
+    //select文で引っ張ってきたユーザー情報を一時的に格納するリスト
     private List<User> toUsers(ResultSet rs) throws SQLException {
 
 	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
@@ -140,8 +141,9 @@ public class UserDao {
             close(rs);
         }
     }
-    public User select(Connection connection, int id) {
 
+    //設定画面に現在のユーザー情報を表示する
+    public User select(Connection connection, int id) {
 
         log.info(new Object(){}.getClass().getEnclosingClass().getName() +
         " : " + new Object(){}.getClass().getEnclosingMethod().getName());
@@ -172,6 +174,8 @@ public class UserDao {
             close(ps);
         }
     }
+
+    //設定（ユーザー情報更新）
     public void update(Connection connection, User user) {
 
         log.info(new Object(){}.getClass().getEnclosingClass().getName() +
@@ -211,6 +215,32 @@ public class UserDao {
             }
         } catch (SQLException e) {
     	  log.log(Level.SEVERE, new Object(){}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
+            throw new SQLRuntimeException(e);
+        } finally {
+            close(ps);
+        }
+    }
+    //JSPで入力されたaccount名と一致するユーザー情報を取得
+    public User select(Connection connection, String account) {
+
+        PreparedStatement ps = null;
+        try {
+            String sql = "SELECT * FROM users WHERE account = ?";
+
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, account);
+
+            ResultSet rs = ps.executeQuery();
+
+            List<User> users = toUsers(rs);
+            if (users.isEmpty()) {
+                return null;
+            } else if (2 <= users.size()) {
+                throw new IllegalStateException("ユーザーが重複しています");
+            } else {
+                return users.get(0);
+            }
+        } catch (SQLException e) {
             throw new SQLRuntimeException(e);
         } finally {
             close(ps);
