@@ -48,13 +48,14 @@ public class EditServlet extends HttpServlet{
 	    List<String> errorMessages = new ArrayList<String>();
 	    String messageId = request.getParameter("id");
 
-	    if(!StringUtils.isBlank(messageId) || messageId.matches("^[0-9]+$")) {
-	    	//検査okだったらselect
+	    if(!StringUtils.isBlank(messageId) && messageId.matches("^[0-9]+$")) {
     	    message = new MessageService().select(Integer.parseInt(messageId));
-	    }
-
-
+    	    if(message == null) {
+    	    	errorMessages.add("不正なパラメータが入力されました");
+    	    }
+	    } else {
         	errorMessages.add("不正なパラメータが入力されました");
+	    }
 
 
         if(errorMessages.size() != 0) {

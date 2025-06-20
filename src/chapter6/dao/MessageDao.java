@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,10 +83,16 @@ public class MessageDao {
     	            ps.setInt(1, id);
 
     	            ResultSet rs = ps.executeQuery();
-    	            Message message = getMessage(rs);
 
-    	            return message;
-
+    	            List<Message> messages = toMessage(rs);
+    	            if (messages.isEmpty()) {
+    	                return null;
+    	            } else if (2 <= messages.size()) {
+    	        		log.log(Level.SEVERE, "同じidのつぶやきが複数存在しています", new IllegalStateException());
+    	                throw new IllegalStateException("同じidのつぶやきが複数存在しています");
+    	            } else {
+    	                return messages.get(0);
+    	            }
     	        } catch (SQLException e) {
     			log.log(Level.SEVERE, new Object(){}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
     	            throw new SQLRuntimeException(e);
@@ -94,20 +102,23 @@ public class MessageDao {
     }
 
     //一時的に格納
-    private Message getMessage(ResultSet rs) throws SQLException {
+    private List<Message> toMessage(ResultSet rs) throws SQLException {
   	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
   	        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
 
+  	        List<Message> messages = new ArrayList<Message>();
   	        try {
-  	        	Message message = new Message();
   	            while (rs.next()) {
+  	  	        	Message message = new Message();
   	                message.setId(rs.getInt("id"));
   	                message.setUserId(rs.getInt("user_id"));
   	                message.setText(rs.getString("text"));
   	                message.setCreatedDate(rs.getTimestamp("created_date"));
   	                message.setUpdatedDate(rs.getTimestamp("updated_date"));
+
+  	                messages.add(message);
   	            }
-  	            return message;
+  	            return messages;
   	        } finally {
   	            close(rs);
   	        }
