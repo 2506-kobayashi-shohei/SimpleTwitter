@@ -117,6 +117,7 @@ public class MessageService {
 		}
 	}
 
+	//Userに紐づくメッセージの取得
 	public List<UserMessage> select(String userId) {
 
 		log.info(new Object() {

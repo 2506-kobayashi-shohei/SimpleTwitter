@@ -62,15 +62,13 @@
 				<div class="message">
 					<div class="account-name">
 						<span class="account"> <a
-							href="./?user_id=<c:out value="${message.userId}"/> "> <c:out
-									value="${message.account}" />
+							href="./?user_id=<c:out value="${message.userId}"/> ">
+							<c:out	value="${message.account}" />
 						</a>
 						</span> <span class="name"><c:out value="${message.name}" /></span>
 					</div>
 					<div class="text">
-						<pre>
-							<c:out value="${message.text}" />
-						</pre>
+						<pre><c:out value="${message.text}"/></pre>
 					</div>
 					<div class="date">
 						<fmt:formatDate value="${message.createdDate}"
@@ -91,7 +89,36 @@
 								</form>
 							</div>
 						</c:if>
+						<div class="comment">
+							<form action="comment" method="post">
+								返信<br />
+								<textarea name="text" cols="100" rows="5" class="tweet-box"></textarea><br />
+								<input name="id" value="${message.id}" id="id" type="hidden" />
+								<input type="submit" value="返信" />
+							</form>
+						</div>
 					</c:if>
+					<div class="comments" >
+					<c:forEach items="${comments}" var="comment">
+						<c:if test="${comment.messageId == message.id}">
+							<div class="account-name">
+								<span class="account">
+									<c:out	value="${comment.account}" />
+								</span>
+								<span class="name">
+									<c:out value="${comment.name}" />
+								</span>
+							</div>
+							<div class="text">
+								<pre><c:out value="${comment.text}"/></pre>
+							</div>
+							<div class="date">
+								<fmt:formatDate value="${comment.createdDate}"
+									pattern="yyyy/MM/dd HH:mm:ss" />
+							</div>
+						</c:if>
+					</c:forEach>
+					</div>
 				</div>
 			</c:forEach>
 		</div>
