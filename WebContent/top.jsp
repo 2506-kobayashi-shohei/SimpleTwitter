@@ -63,7 +63,7 @@
                         <div class="text"><pre><c:out value="${message.text}" /></pre></div>
                         <div class="date"><fmt:formatDate value="${message.createdDate}" pattern="yyyy/MM/dd HH:mm:ss" /></div>
                         <c:if test = "${not empty loginUser}">
-                            <c:if test = "${loginUser.account == message.account}">
+                            <c:if test = "${loginUser.id == message.userId}">
                                 <div class="edit">
                                     <form action="edit" method="get">
                                         <input name="id" value="${message.id}" id="id" type="hidden"/>
