@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -43,6 +44,7 @@ public class EditServlet extends HttpServlet{
         " : " + new Object(){}.getClass().getEnclosingMethod().getName());
 
 	    Message message = null;
+        HttpSession session = request.getSession();
 	    List<String> errorMessages = new ArrayList<String>();
 	    String messageId = request.getParameter("id");
 
@@ -51,8 +53,8 @@ public class EditServlet extends HttpServlet{
 	    }
 	    if(message == null) {
 	    	errorMessages.add("不正なパラメータが入力されました");
-            request.setAttribute("errorMessages", errorMessages);
-            request.getRequestDispatcher("top.jsp").forward(request, response);
+            session.setAttribute("errorMessages", errorMessages);
+            response.sendRedirect("./");
 	    	return;
 	    }
 
@@ -72,7 +74,7 @@ public class EditServlet extends HttpServlet{
        message.setText(request.getParameter("text"));
        List<String> errorMessages = new ArrayList<String>();
 
-       if(!isValid(message.getText(),errorMessages)) {
+       if(!isValid(message.getText(), errorMessages)) {
            request.setAttribute("errorMessages", errorMessages);
            request.setAttribute("message", message);
            request.getRequestDispatcher("edit.jsp").forward(request, response);
@@ -99,6 +101,4 @@ public class EditServlet extends HttpServlet{
         }
         return true;
     }
-
-
 }

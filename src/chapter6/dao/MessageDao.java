@@ -76,7 +76,7 @@ public class MessageDao {
 
     	        PreparedStatement ps = null;
     	        try {
-    	            String sql = "SELECT * FROM messages WHERE id=?";
+    	            String sql = "SELECT * FROM messages WHERE id = ?";
 
     	            ps = connection.prepareStatement(sql.toString());
 
@@ -163,7 +163,7 @@ public class MessageDao {
 
   	        PreparedStatement ps = null;
   	        try {
-  	            String sql = "DELETE FROM messages WHERE id=?";
+  	            String sql = "DELETE FROM messages WHERE id = ?";
 
   	            ps = connection.prepareStatement(sql.toString());
 
