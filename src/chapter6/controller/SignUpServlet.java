@@ -20,104 +20,111 @@ import chapter6.service.UserService;
 @WebServlet(urlPatterns = { "/signup" })
 public class SignUpServlet extends HttpServlet {
 
+	/**
+	* ロガーインスタンスの生成
+	*/
+	Logger log = Logger.getLogger("twitter");
 
-   /**
-   * ロガーインスタンスの生成
-   */
-    Logger log = Logger.getLogger("twitter");
+	/**
+	* デフォルトコンストラクタ
+	* アプリケーションの初期化を実施する。
+	*/
+	public SignUpServlet() {
+		InitApplication application = InitApplication.getInstance();
+		application.init();
 
-    /**
-    * デフォルトコンストラクタ
-    * アプリケーションの初期化を実施する。
-    */
-    public SignUpServlet() {
-        InitApplication application = InitApplication.getInstance();
-        application.init();
+	}
 
-    }
+	//登録画面呼び出し
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
 
-    //登録画面呼び出し
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		request.getRequestDispatcher("signup.jsp").forward(request, response);
+	}
 
-        request.getRequestDispatcher("signup.jsp").forward(request, response);
-    }
+	//登録処理
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
 
-    //登録処理
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		List<String> errorMessages = new ArrayList<String>();
 
-        List<String> errorMessages = new ArrayList<String>();
+		User user = getUser(request);
+		if (!isValid(user, errorMessages)) {
+			request.setAttribute("errorMessages", errorMessages);
+			request.getRequestDispatcher("signup.jsp").forward(request, response);
+			return;
+		}
+		new UserService().insert(user);
+		response.sendRedirect("./");
+	}
 
-        User user = getUser(request);
-        if (!isValid(user, errorMessages)) {
-            request.setAttribute("errorMessages", errorMessages);
-            request.getRequestDispatcher("signup.jsp").forward(request, response);
-            return;
-        }
-        new UserService().insert(user);
-        response.sendRedirect("./");
-    }
+	//登録画面から登録したいユーザー情報を取得
+	private User getUser(HttpServletRequest request) throws IOException, ServletException {
 
-    //登録画面から登録したいユーザー情報を取得
-    private User getUser(HttpServletRequest request) throws IOException, ServletException {
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		User user = new User();
+		user.setName(request.getParameter("name"));
+		user.setAccount(request.getParameter("account"));
+		user.setPassword(request.getParameter("password"));
+		user.setEmail(request.getParameter("email"));
+		user.setDescription(request.getParameter("description"));
+		return user;
+	}
 
-        User user = new User();
-        user.setName(request.getParameter("name"));
-        user.setAccount(request.getParameter("account"));
-        user.setPassword(request.getParameter("password"));
-        user.setEmail(request.getParameter("email"));
-        user.setDescription(request.getParameter("description"));
-        return user;
-    }
+	private boolean isValid(User user, List<String> errorMessages) {
 
-    private boolean isValid(User user, List<String> errorMessages) {
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		String name = user.getName();
+		String account = user.getAccount();
+		String password = user.getPassword();
+		String email = user.getEmail();
+		User existingUser = new UserService().select(account);
 
-        String name = user.getName();
-        String account = user.getAccount();
-        String password = user.getPassword();
-        String email = user.getEmail();
-        User existingUser = new UserService().select(account);
+		if (!StringUtils.isEmpty(name) && (20 < name.length())) {
+			errorMessages.add("名前は20文字以下で入力してください");
+		}
 
-        if (!StringUtils.isEmpty(name) && (20 < name.length())) {
-            errorMessages.add("名前は20文字以下で入力してください");
-        }
+		if (StringUtils.isEmpty(account)) {
+			errorMessages.add("アカウント名を入力してください");
+		} else if (20 < account.length()) {
+			errorMessages.add("アカウント名は20文字以下で入力してください");
+		}
 
-        if (StringUtils.isEmpty(account)) {
-            errorMessages.add("アカウント名を入力してください");
-        } else if (20 < account.length()) {
-            errorMessages.add("アカウント名は20文字以下で入力してください");
-        }
+		if (existingUser != null) {
+			errorMessages.add("すでに存在するアカウントです");
+		}
 
-        if(existingUser != null){
-            errorMessages.add("すでに存在するアカウントです");
-        }
+		if (StringUtils.isEmpty(password)) {
+			errorMessages.add("パスワードを入力してください");
+		}
 
-        if (StringUtils.isEmpty(password)) {
-            errorMessages.add("パスワードを入力してください");
-        }
+		if (!StringUtils.isEmpty(email) && (50 < email.length())) {
+			errorMessages.add("メールアドレスは50文字以下で入力してください");
+		}
 
-        if (!StringUtils.isEmpty(email) && (50 < email.length())) {
-            errorMessages.add("メールアドレスは50文字以下で入力してください");
-        }
-
-        if (errorMessages.size() != 0) {
-            return false;
-        }
-        return true;
-    }
+		if (errorMessages.size() != 0) {
+			return false;
+		}
+		return true;
+	}
 }

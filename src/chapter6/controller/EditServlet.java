@@ -19,86 +19,92 @@ import chapter6.logging.InitApplication;
 import chapter6.service.MessageService;
 
 @WebServlet(urlPatterns = { "/edit" })
-public class EditServlet extends HttpServlet{
+public class EditServlet extends HttpServlet {
 
 	/**
 	* ロガーインスタンスの生成
 	*/
-    Logger log = Logger.getLogger("twitter");
+	Logger log = Logger.getLogger("twitter");
 
-    /**
-    * デフォルトコンストラクタ
-    * アプリケーションの初期化を実施する。
-    */
-    public EditServlet() {
-        InitApplication application = InitApplication.getInstance();
-        application.init();
+	/**
+	* デフォルトコンストラクタ
+	* アプリケーションの初期化を実施する。
+	*/
+	public EditServlet() {
+		InitApplication application = InitApplication.getInstance();
+		application.init();
 
-    }
+	}
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-	    Message message = null;
-        HttpSession session = request.getSession();
-	    List<String> errorMessages = new ArrayList<String>();
-	    String messageId = request.getParameter("id");
+		Message message = null;
+		HttpSession session = request.getSession();
+		List<String> errorMessages = new ArrayList<String>();
+		String messageId = request.getParameter("id");
 
-	    if(!StringUtils.isBlank(messageId) && messageId.matches("^[0-9]+$")) {
-    	    message = new MessageService().select(Integer.parseInt(messageId));
-	    }
-	    if(message == null) {
-	    	errorMessages.add("不正なパラメータが入力されました");
-            session.setAttribute("errorMessages", errorMessages);
-            response.sendRedirect("./");
-	    	return;
-	    }
+		if (!StringUtils.isBlank(messageId) && messageId.matches("^[0-9]+$")) {
+			message = new MessageService().select(Integer.parseInt(messageId));
+		}
+		if (message == null) {
+			errorMessages.add("不正なパラメータが入力されました");
+			session.setAttribute("errorMessages", errorMessages);
+			response.sendRedirect("./");
+			return;
+		}
 
-        request.setAttribute("message", message);
-        request.getRequestDispatcher("edit.jsp").forward(request, response);
-    }
+		request.setAttribute("message", message);
+		request.getRequestDispatcher("edit.jsp").forward(request, response);
+	}
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-       Message message = new Message();
-       message.setId(Integer.parseInt(request.getParameter("id")));
-       message.setText(request.getParameter("text"));
-       List<String> errorMessages = new ArrayList<String>();
+		Message message = new Message();
+		message.setId(Integer.parseInt(request.getParameter("id")));
+		message.setText(request.getParameter("text"));
+		List<String> errorMessages = new ArrayList<String>();
 
-       if(!isValid(message.getText(), errorMessages)) {
-           request.setAttribute("errorMessages", errorMessages);
-           request.setAttribute("message", message);
-           request.getRequestDispatcher("edit.jsp").forward(request, response);
-           return;
-       }
-	   new MessageService().update(message);
+		if (!isValid(message.getText(), errorMessages)) {
+			request.setAttribute("errorMessages", errorMessages);
+			request.setAttribute("message", message);
+			request.getRequestDispatcher("edit.jsp").forward(request, response);
+			return;
+		}
+		new MessageService().update(message);
 
-       response.sendRedirect("./");
-    }
+		response.sendRedirect("./");
+	}
 
-    private boolean isValid(String text, List<String> errorMessages) {
+	private boolean isValid(String text, List<String> errorMessages) {
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-        if (StringUtils.isBlank(text)) {
-            errorMessages.add("メッセージを入力してください");
-        } else if (140 < text.length()) {
-            errorMessages.add("140文字以下で入力してください");
-        }
+		if (StringUtils.isBlank(text)) {
+			errorMessages.add("メッセージを入力してください");
+		} else if (140 < text.length()) {
+			errorMessages.add("140文字以下で入力してください");
+		}
 
-        if (errorMessages.size() != 0) {
-            return false;
-        }
-        return true;
-    }
+		if (errorMessages.size() != 0) {
+			return false;
+		}
+		return true;
+	}
 }
