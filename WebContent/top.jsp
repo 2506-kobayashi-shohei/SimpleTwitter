@@ -37,6 +37,13 @@
 				</div>
 			</c:if>
 		</div>
+		<div class="refineSearch">
+			<form action="" method="get">
+				日付：<input name="start" value="${start}" id="start" type="date" />
+				～<input name="end" value="${end}" id="end" type="date" />
+				<input type="submit" value="絞り込み">
+			</form>
+		</div>
 		<c:if test="${ not empty errorMessages }">
 			<div class="errorMessages">
 				<ul>

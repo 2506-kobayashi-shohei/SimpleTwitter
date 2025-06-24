@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 
 import chapter6.beans.Message;
+import chapter6.beans.User;
 import chapter6.logging.InitApplication;
 import chapter6.service.MessageService;
 
@@ -49,11 +50,12 @@ public class EditServlet extends HttpServlet {
 		HttpSession session = request.getSession();
 		List<String> errorMessages = new ArrayList<String>();
 		String messageId = request.getParameter("id");
+		User user = (User) request.getSession().getAttribute("loginUser");
 
 		if (!StringUtils.isBlank(messageId) && messageId.matches("^[0-9]+$")) {
 			message = new MessageService().select(Integer.parseInt(messageId));
 		}
-		if (message == null) {
+		if (message == null || message.getUserId() != user.getId() ) {
 			errorMessages.add("不正なパラメータが入力されました");
 			session.setAttribute("errorMessages", errorMessages);
 			response.sendRedirect("./");

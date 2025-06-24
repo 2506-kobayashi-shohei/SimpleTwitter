@@ -4,6 +4,8 @@ import static chapter6.utils.CloseableUtil.*;
 import static chapter6.utils.DBUtil.*;
 
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -118,7 +120,7 @@ public class MessageService {
 	}
 
 	//Userに紐づくメッセージの取得
-	public List<UserMessage> select(String userId) {
+	public List<UserMessage> select(String userId, String start, String end) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
@@ -135,7 +137,19 @@ public class MessageService {
 				id = Integer.parseInt(userId);
 			}
 
-			List<UserMessage> messages = new UserMessageDao().select(connection, id, LIMIT_NUM);
+			String startFilter = "2020-01-01 00:00:00";
+			if (!StringUtils.isEmpty(start)) {
+				startFilter = start + " 00:00:00";
+			}
+
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date date = new Date();
+			String endFilter = df.format(date);
+			if (!StringUtils.isEmpty(end)) {
+				endFilter = end + " 23:59:59";
+			}
+
+			List<UserMessage> messages = new UserMessageDao().select(connection, id, startFilter, endFilter, LIMIT_NUM);
 			commit(connection);
 
 			return messages;
