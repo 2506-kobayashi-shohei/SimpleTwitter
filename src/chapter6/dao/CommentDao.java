@@ -41,7 +41,6 @@ public class CommentDao {
 		try {
 			StringBuilder sql = new StringBuilder();
 			sql.append("INSERT INTO comments ( ");
-
 			sql.append("    text, ");
 			sql.append("    user_id, ");
 			sql.append("    message_id, ");

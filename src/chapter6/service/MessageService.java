@@ -137,19 +137,21 @@ public class MessageService {
 				id = Integer.parseInt(userId);
 			}
 
-			String startFilter = "2020-01-01 00:00:00";
 			if (!StringUtils.isEmpty(start)) {
-				startFilter = start + " 00:00:00";
+				start += " 00:00:00";
+			} else {
+				start = "2020-01-01 00:00:00";
 			}
 
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date date = new Date();
-			String endFilter = df.format(date);
 			if (!StringUtils.isEmpty(end)) {
-				endFilter = end + " 23:59:59";
+				end += " 23:59:59";
+			} else {
+				end = df.format(date);
 			}
 
-			List<UserMessage> messages = new UserMessageDao().select(connection, id, startFilter, endFilter, LIMIT_NUM);
+			List<UserMessage> messages = new UserMessageDao().select(connection, id, start, end, LIMIT_NUM);
 			commit(connection);
 
 			return messages;
